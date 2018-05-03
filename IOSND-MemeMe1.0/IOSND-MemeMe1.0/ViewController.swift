@@ -32,7 +32,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         super.viewDidLoad()
         
         enableOnlyAvailableSources()
-        configTextFields()
+        configure(topTextField, textContent: "TOP")
+        configure(bottomTextField, textContent: "BOTTOM")
         createShareButton()
     }
     
@@ -98,26 +99,43 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         if bottomTextField.text?.trimmingCharacters(in: charSet) == "" {
             bottomTextField.text = "BOTTOM"
         }
+        
+        //When the bottom textfield loses the focus,
+        //we resize the view to its original size.
+        //With that, the textfield with focus will
+        //always be shown in the screen.
+        keyboardWillHide(Notification(name: Notification.Name.UIFocusDidUpdate))
     }
     
     //Opens the hardware camera
-    @IBAction func cameraButton_click(_ sender: Any) {
+    @IBAction func cameraButtonClick(_ sender: Any) {
         
         callImagePickerController(.camera)
     }
     
     //Opens the photo library
-    @IBAction func photosButton_click(_ sender: Any) {
+    @IBAction func photosButtonClick(_ sender: Any) {
         
         callImagePickerController(.photoLibrary)
     }
     
     //Opens the view that share content
-    @objc func btnShare_clicked() {
+    @objc func shareButtonClick() {
         
-        let controller = UIActivityViewController(activityItems: [generateMemedImage()], applicationActivities: nil)
+        let memedImage = generateMemedImage()
+        
+        let controller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         
         present(controller, animated: true, completion: nil)
+        
+        controller.completionWithItemsHandler = {
+            (activityType: UIActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) -> Void in
+            
+            if completed {
+                self.saveMemeData(memedImage)
+            }
+            
+        }
     }
     
     //MARK: - Keyboard control methods
@@ -132,9 +150,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     //Removes the observers to KeyboardWillShow and KeyboardWillHide
     func unsubscribeToKeyboardNotifications() {
         
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillShow, object: nil)
-        
-        NotificationCenter.default.removeObserver(self, name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self)
     }
     
     //Resizes the view so the keyboard don't comes in his front
@@ -158,6 +174,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         return keyboardSize.cgRectValue.height
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+    
     //MARK: - TextFields config methods
     
     //Gets the text attributes to use with defaultTextAttributes property of a TextField
@@ -173,31 +193,24 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         return memeTextAttributes
     }
     
-    //Configs the textFields
-    func configTextFields() {
+    //Configures a textField to Its initial attributes values
+    func configure(_ textField: UITextField, textContent: String) {
         
         let textAttributes = getTextAttributes()
         
-        topTextField.defaultTextAttributes = textAttributes
-        bottomTextField.defaultTextAttributes = textAttributes
+        textField.defaultTextAttributes = textAttributes
+        textField.textAlignment = .center
         
-        topTextField.textAlignment = .center
-        bottomTextField.textAlignment = .center
-        
-        restartTextFields(true)
+        restartTextFields(textField, true, textContent)
     }
     
     //Restart the TextFields to it's initial state, except for the visibility
-    func restartTextFields(_ hidden: Bool) {
+    func restartTextFields(_ textField: UITextField, _ hidden: Bool, _ textContent: String) {
         
-        topTextField.isHidden = hidden
-        bottomTextField.isHidden = hidden
+        textField.isHidden = hidden
+        textField.text = textContent
         
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-        
-        self.view!.bringSubview(toFront: topTextField)
-        self.view!.bringSubview(toFront: bottomTextField)
+        self.view!.bringSubview(toFront: textField)
     }
     
     
@@ -212,7 +225,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             enableShareButton(true)
         }
         
-        picker.dismiss(animated: true, completion: {self.restartTextFields(false)})
+        picker.dismiss(animated: true, completion: {
+            self.restartTextFields(self.topTextField, false, "TOP")
+            self.restartTextFields(self.bottomTextField, false, "BOTTOM")
+        })
     }
 
     //Calls the UIImagePickerController
@@ -239,8 +255,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         toolBar.isHidden = false
         
-        saveMemeData(memedImage)
-        
         return memedImage
     }
     
@@ -262,7 +276,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     //Creates the share button in the navigation bar
     func createShareButton() {
         
-        btnShare = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(btnShare_clicked))
+        btnShare = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareButtonClick))
         
         enableShareButton(false)
         
