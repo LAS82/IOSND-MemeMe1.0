@@ -18,11 +18,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var toolBar: UIToolbar!
-    
-    //MARK: - Other properties
-    
-    var memeData: Meme!
-    var btnShare: UIBarButtonItem!
+    @IBOutlet weak var topToolbar: UIToolbar!
+    @IBOutlet weak var btnShare: UIBarButtonItem!
     
     //MARK: - View events
     
@@ -32,9 +29,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         super.viewDidLoad()
         
         enableOnlyAvailableSources()
+        self.tabBarController?.tabBar.isHidden = true
+        
         configure(topTextField, textContent: "TOP")
         configure(bottomTextField, textContent: "BOTTOM")
-        createShareButton()
+        enableShareButton(false)
     }
     
     //Starts listen the keyboard notifications
@@ -49,6 +48,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         super.viewWillDisappear(animated)
         unsubscribeToKeyboardNotifications()
+    }
+    
+    //Shows the tabBar again
+    override func viewDidDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     //MARK: - Objects events
@@ -119,9 +123,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         callImagePickerController(.photoLibrary)
     }
     
+    //Closes this View
+    @IBAction func cancelButtonClick(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
     //Opens the view that share content
-    @objc func shareButtonClick() {
-        
+    @IBAction func shareButtonClick(_ sender: Any) {
         let memedImage = generateMemedImage()
         
         let controller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
@@ -135,6 +143,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 self.saveMemeData(memedImage)
             }
             
+            //Back to the first app's view
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let navigationController = storyboard.instantiateViewController(withIdentifier: "start")
+             
+            self.present(navigationController, animated: true, completion: nil)
         }
     }
     
@@ -246,22 +259,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     //Generates the memed image
     func generateMemedImage() -> UIImage {
         
-        toolBar.isHidden = true
+        self.showToolbars(false)
         
         UIGraphicsBeginImageContext(self.view.frame.size)
         view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
         let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
-        toolBar.isHidden = false
+        self.showToolbars(true)
         
         return memedImage
     }
     
-    //Saves the image information to the Meme structure
+    //Saves the image information
     func saveMemeData(_ memedImage: UIImage) {
         
-        memeData = Meme(originalImage: imageView.image!, memedImage: memedImage, topText: topTextField.text!, bottomText: bottomTextField.text!)
+        let meme = Meme(originalImage: imageView.image!, memedImage: memedImage, topText: topTextField.text!, bottomText: bottomTextField.text!)
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
     }
     
     //MARK: - Other methods
@@ -273,19 +289,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
     }
     
-    //Creates the share button in the navigation bar
-    func createShareButton() {
-        
-        btnShare = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareButtonClick))
-        
-        enableShareButton(false)
-        
-        self.navigationItem.rightBarButtonItem = btnShare
-    }
-    
     //Enables or disables the share button
     func enableShareButton(_ enabled: Bool) {
         btnShare.isEnabled = enabled
     }
+    
+    //Controls toolbars visibility
+    func showToolbars(_ show: Bool) {
+        toolBar.isHidden = !show
+        topToolbar.isHidden = !show
+    }
+    
 }
 
