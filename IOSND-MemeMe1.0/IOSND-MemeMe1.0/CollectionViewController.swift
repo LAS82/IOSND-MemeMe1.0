@@ -10,7 +10,11 @@ import UIKit
 
 class CollectionViewController: UICollectionViewController {
     
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    
     //MARK: - App data
+    
+    @IBOutlet weak var colView: UICollectionView!
     
     let memes = (UIApplication.shared.delegate as! AppDelegate).memes
     
@@ -19,6 +23,13 @@ class CollectionViewController: UICollectionViewController {
     //Sets tabBar visibility
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        colView.reloadData()
+        let space: CGFloat = 3.0
+        let dimension = (view.frame.size.width - (2 * space)) / 3.0
+        
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSize(width: dimension, height: dimension)
         
         self.tabBarController?.tabBar.isHidden = false
     }

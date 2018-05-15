@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     
     //MARK: - Outlet properties
 
@@ -33,6 +33,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         configure(topTextField, textContent: "TOP")
         configure(bottomTextField, textContent: "BOTTOM")
+        
         enableShareButton(false)
     }
     
@@ -79,6 +80,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        return true
+    }
+    
     //Configs the text field before the user start to type
     @IBAction func bottomTextDidBeginEdit(_ sender: Any) {
         
@@ -110,6 +115,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         //always be shown in the screen.
         keyboardWillHide(Notification(name: Notification.Name.UIFocusDidUpdate))
     }
+    
+    
     
     //Opens the hardware camera
     @IBAction func cameraButtonClick(_ sender: Any) {
@@ -143,11 +150,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 self.saveMemeData(memedImage)
             }
             
-            //Back to the first app's view
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let navigationController = storyboard.instantiateViewController(withIdentifier: "start")
-             
-            self.present(navigationController, animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -169,7 +172,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     //Resizes the view so the keyboard don't comes in his front
     @objc func keyboardWillShow(_ notification: Notification) {
         
-        view.frame.origin.y = 0 - getKeyboardHeight(notification)
+        view.frame.origin.y = -getKeyboardHeight(notification)
     }
     
     //Resizes the view to cover all the safe area
@@ -213,6 +216,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         textField.defaultTextAttributes = textAttributes
         textField.textAlignment = .center
+        
+        textField.delegate = self
         
         restartTextFields(textField, true, textContent)
     }
@@ -266,7 +271,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let memedImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
-        self.showToolbars(true)
+        showToolbars(true)
         
         return memedImage
     }

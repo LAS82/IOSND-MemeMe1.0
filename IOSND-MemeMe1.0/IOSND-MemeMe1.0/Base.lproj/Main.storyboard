@@ -156,7 +156,6 @@
         <!--Table Controller-->
         <scene sceneID="MRo-bf-i6O">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Yx2-MI-Zbo" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController title="Table Controller" id="ecK-Rt-c4r" customClass="TableViewController" customModule="IOSND_MemeMe1_0" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="IA0-zP-lmz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
@@ -198,9 +197,11 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="tableView" destination="ic5-EQ-BzB" id="Hsd-Nm-UCJ"/>
                         <segue destination="Z8c-vE-48l" kind="presentation" identifier="MemeDetail" id="J19-el-nsg"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Yx2-MI-Zbo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-46" y="-281"/>
         </scene>
@@ -267,6 +268,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="colView" destination="LBh-4b-C4f" id="6Fh-UC-KbD"/>
+                        <outlet property="flowLayout" destination="MMf-uA-Mzj" id="QdI-1K-8VK"/>
                         <segue destination="Z8c-vE-48l" kind="presentation" identifier="MemeDetail" id="lEd-Is-19k"/>
                     </connections>
                 </collectionViewController>
@@ -310,7 +313,7 @@
         <image name="table_30x30" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="J19-el-nsg"/>
-        <segue reference="5s7-0h-yZL"/>
+        <segue reference="lEd-Is-19k"/>
+        <segue reference="QvE-H9-0MP"/>
     </inferredMetricsTieBreakers>
 </document>

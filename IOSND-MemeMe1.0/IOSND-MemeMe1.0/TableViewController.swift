@@ -10,6 +10,7 @@ import UIKit
 
 class TableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
     
+    @IBOutlet weak var tableView: UITableView!
     //MARK: - App data
     
     var memes = (UIApplication.shared.delegate as! AppDelegate).memes
@@ -20,6 +21,7 @@ class TableViewController: UIViewController, UITableViewDataSource, UITableViewD
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        tableView.reloadData()
         self.tabBarController?.tabBar.isHidden = false
     }
     
