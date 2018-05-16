@@ -16,14 +16,17 @@ class CollectionViewController: UICollectionViewController {
     
     @IBOutlet weak var colView: UICollectionView!
     
-    let memes = (UIApplication.shared.delegate as! AppDelegate).memes
+    var memes: [Meme] = []
     
     //MARK: - View events
     
     //Sets tabBar visibility
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        memes = (UIApplication.shared.delegate as! AppDelegate).memes
         colView.reloadData()
+        
         let space: CGFloat = 3.0
         let dimension = (view.frame.size.width - (2 * space)) / 3.0
         
@@ -32,6 +35,7 @@ class CollectionViewController: UICollectionViewController {
         flowLayout.itemSize = CGSize(width: dimension, height: dimension)
         
         self.tabBarController?.tabBar.isHidden = false
+        
     }
     
     //MARK: - Collection Methods

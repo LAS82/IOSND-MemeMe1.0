@@ -8,12 +8,12 @@
 
 import UIKit
 
-class TableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
+class TableViewController: UIViewController, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     //MARK: - App data
     
-    var memes = (UIApplication.shared.delegate as! AppDelegate).memes
+    var memes: [Meme] = []
     
     //MARK: - View events
     
@@ -21,8 +21,11 @@ class TableViewController: UIViewController, UITableViewDataSource, UITableViewD
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        memes = (UIApplication.shared.delegate as! AppDelegate).memes
         tableView.reloadData()
+        
         self.tabBarController?.tabBar.isHidden = false
+        
     }
     
     //MARK: - Table methods
@@ -44,6 +47,13 @@ class TableViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         return cell
     }
+    
+    
+    
+}
+
+
+extension TableViewController : UITableViewDelegate {
     
     //Show image's detail
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
